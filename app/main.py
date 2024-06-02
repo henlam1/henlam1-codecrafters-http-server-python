@@ -8,7 +8,7 @@ def handle_request(client_socket: socket):
     data = client_socket.recv(1024)
 
     # Decode and split data
-    request, header, body = data.decode().split(CRLF)
+    request, header, *body = data.decode().split(CRLF)
 
     # Parse request
     url = request.split(" ")[1]
