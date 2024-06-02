@@ -25,12 +25,23 @@ def main():
     print("Logs from your program will appear here!")
 
     # Create server socket and connect to clients
-    server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
-    client, addr = server_socket.accept() # wait for client
-    
-    # Handle request and close connection
-    handle_request(client)
-    client.close()
+    server_socket = socket.create_server(("localhost", 4221))
+
+    try:
+        while True:
+            # Wait for a connection
+            client, addr = server_socket.accept() # wait for client
+            print(f"Connection with {addr} established.")
+
+            # Handle request and close connection
+            handle_request(client)
+            client.close()
+    except KeyboardInterrupt:
+        print("\nServer is shutting down.")
+    finally:
+        # Close server socket
+        server_socket.close()
+        print("Server shut down.")
 
 
 if __name__ == "__main__":
