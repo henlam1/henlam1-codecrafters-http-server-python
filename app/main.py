@@ -1,11 +1,23 @@
 import socket
 
 def handle_request(client_socket: socket):
+    # Constants
+    CRLF = "\r\n"
+
     # Receive 1024 bytes from the client
-    client_socket.recv(1024)
+    data = client_socket.recv(1024)
+
+    # Decode and split data
+    request, header, body = data.decode().split(CRLF)
+
+    # Parse request
+    url = request.split(" ")[1]
+    if url != '/':
+        response = "HTTP/1.1 404 Not Found\r\n\r\n"
+    else:
+        response = "HTTP/1.1 200 OK\r\n\r\n"
 
     # Send the encoded response to the client
-    response = "HTTP/1.1 200 OK\r\n\r\n"
     client_socket.send(response.encode())
 
 def main():
