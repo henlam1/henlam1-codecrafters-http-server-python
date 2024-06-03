@@ -1,7 +1,7 @@
 import socket
 
 # Handle routes
-def handle_root(path):
+def handle_root():
     return "HTTP/1.1 200 OK\r\n\r\n"
 
 def handle_echo(path):
@@ -14,7 +14,6 @@ def handle_404():
 # Routing Table
 ROUTES = {
     '/echo': handle_echo,
-    '/': handle_root,
 }
 
 def handle_request(client_socket: socket):
@@ -35,7 +34,11 @@ def handle_request(client_socket: socket):
     client_socket.send(response.encode())
 
 def handle_endpoints(url: str):
-    # Handle all endpoints
+    # Handles root first
+    if url == '/':
+        return handle_root()
+    
+    # Handle all other endpoints
     for path, handler in ROUTES.items():
         if url.startswith(path):
             return handler(url)
