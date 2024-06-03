@@ -5,7 +5,7 @@ def handle_root():
     return "HTTP/1.1 200 OK\r\n\r\n"
 
 def handle_echo(path):
-    content = path.split("/echo")[1]
+    content = path.split("/echo/")[1]
     return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(content)}\r\n\r\n{content}"
 
 def handle_404():
