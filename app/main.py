@@ -12,13 +12,25 @@ def handle_request(client_socket: socket):
 
     # Parse request
     url = request.split(" ")[1]
-    if url != '/':
-        response = "HTTP/1.1 404 Not Found\r\n\r\n"
-    else:
-        response = "HTTP/1.1 200 OK\r\n\r\n"
+    response = handle_endpoints(url)
 
     # Send the encoded response to the client
     client_socket.send(response.encode())
+
+def handle_endpoints(url: str):
+    # Handles / path
+    if url == '/':
+        return "HTTP/1.1 200 OK\r\n\r\n"
+    
+    # Handles other paths
+    elif url.startswith('/echo/'):
+        path = url.split("/echo/")
+        content = path[1]
+        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(content)}\r\n\r\n{content}"
+    else:
+        response = "HTTP/1.1 404 Not Found\r\n\r\n"
+
+    return response
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
