@@ -1,7 +1,7 @@
 import socket
 
 # Handle routes
-def handle_root():
+def handle_root(path):
     return "HTTP/1.1 200 OK\r\n\r\n"
 
 def handle_echo(path):
@@ -35,9 +35,13 @@ def handle_request(client_socket: socket):
     client_socket.send(response.encode())
 
 def handle_endpoints(url: str):
+    # Handle all endpoints
     for path, handler in ROUTES.items():
         if url.startswith(path):
             return handler(url)
+        
+    # Return error if path not found
+    return handle_404()
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
