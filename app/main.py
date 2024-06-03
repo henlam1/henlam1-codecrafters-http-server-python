@@ -1,5 +1,22 @@
 import socket
 
+# Handle routes
+def handle_root():
+    return "HTTP/1.1 200 OK\r\n\r\n"
+
+def handle_echo(path):
+    content = path.split("/echo")[1]
+    return f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(content)}\r\n\r\n{content}"
+
+def handle_404():
+    return "HTTP/1.1 404 Not Found\r\n\r\n"
+
+# Routing Table
+ROUTES = {
+    '/echo': handle_echo,
+    '/': handle_root,
+}
+
 def handle_request(client_socket: socket):
     # Constants
     CRLF = "\r\n"
@@ -18,19 +35,9 @@ def handle_request(client_socket: socket):
     client_socket.send(response.encode())
 
 def handle_endpoints(url: str):
-    # Handles / path
-    if url == '/':
-        return "HTTP/1.1 200 OK\r\n\r\n"
-    
-    # Handles other paths
-    elif url.startswith('/echo/'):
-        path = url.split("/echo/")
-        content = path[1]
-        response = f"HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: {len(content)}\r\n\r\n{content}"
-    else:
-        response = "HTTP/1.1 404 Not Found\r\n\r\n"
-
-    return response
+    for path, handler in ROUTES.items():
+        if url.startswith(path):
+            return handler(url)
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
