@@ -1,0 +1,2 @@
+# Constants
+CRLF = "\r\n"
