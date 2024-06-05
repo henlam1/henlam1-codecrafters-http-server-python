@@ -36,12 +36,19 @@ def handle_endpoints(request, path, version, headers):
     if path == '/':
         return handle_root()
     
+    # Split params by '/' delimeter
+    params = path.split('/')
+
     # Handle all other endpoints
-    for endpoint, handler in ROUTES.items():
-        if path.startswith(endpoint):
-            return handler(request, path, version, headers)
+    # for endpoint, handler in ROUTES.items():
+    #     if path.startswith(endpoint):
+    #         return handler(request, path, version, headers
+    endpoint = params[1]
+    if endpoint in ROUTES:
+        handler = ROUTES[endpoint]
+        return handler(request, path, version, headers)
         
-    # Return error if path not found
+    # Return error if endpoint not found
     return handle_404()
 
 # Routing Table
