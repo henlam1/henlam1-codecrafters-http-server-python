@@ -40,9 +40,6 @@ def handle_endpoints(request, path, version, headers):
     params = path.split('/')
 
     # Handle all other endpoints
-    # for endpoint, handler in ROUTES.items():
-    #     if path.startswith(endpoint):
-    #         return handler(request, path, version, headers
     endpoint = params[1]
     if endpoint in ROUTES:
         handler = ROUTES[endpoint]
@@ -53,8 +50,8 @@ def handle_endpoints(request, path, version, headers):
 
 # Routing Table
 ROUTES = {
-    '/echo': handle_echo,
-    '/user-agent': handle_user_agent,
+    'echo': handle_echo,
+    'user-agent': handle_user_agent,
 }
 
 def parse_request(data):
