@@ -99,7 +99,7 @@ def main():
             client, addr = server_socket.accept() # wait for client
 
             # Create a new thread for each request
-            thread = threading.Threading(target=handle_request, args=(client, addr))
+            thread = threading.Thread(target=handle_request, args=(client, addr))
             thread.start()
     except KeyboardInterrupt:
         print("\nServer is shutting down.")
