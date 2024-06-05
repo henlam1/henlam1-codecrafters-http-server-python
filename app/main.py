@@ -1,4 +1,5 @@
 import socket
+import threading
 
 # Constants
 CRLF = "\r\n"
@@ -70,7 +71,9 @@ def parse_request(data):
     
     return request, path, version, headers
 
-def handle_request(client_socket: socket):
+def handle_request(client_socket: socket, addr):
+    print(f"Connection to {addr} has been established")
+
     # Receive 1024 bytes from the client
     data = client_socket.recv(1024)
 
@@ -94,11 +97,10 @@ def main():
         while True:
             # Wait for a connection
             client, addr = server_socket.accept() # wait for client
-            print(f"Connection with {addr} established.")
 
-            # Handle request and close connection
-            handle_request(client)
-            client.close()
+            # Create a new thread for each request
+            thread = threading.Threading(target=handle_request, args=(client, addr))
+            thread.start()
     except KeyboardInterrupt:
         print("\nServer is shutting down.")
     finally:
