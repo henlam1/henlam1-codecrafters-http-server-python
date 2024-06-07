@@ -13,9 +13,9 @@ def generate_response(status, content_type, body):
         response.append(f"HTTP/1.1 {status}")   # Version and status
     if content_type:
         response.append(f"Content-Type: {content_type}")    # Headers
-    if body:
         response.append(f"Content-Length: {len(body)}")
-        response.append(f"")    # End of headers
+    response.append(f"")    # End of headers
+    if body:
         response.append(body)
     return CRLF.join(response)
 
