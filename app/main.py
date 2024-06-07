@@ -107,7 +107,7 @@ def parse_request(data):
         headers[header] = value
     body = lines[-1]
     
-    return request, path, version, headers, body, body
+    return request, path, version, headers, body
 
 def handle_request(client_socket: socket, addr):
     print(f"Connection to {addr} has been established")
