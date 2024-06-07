@@ -147,15 +147,20 @@ def main():
 
     # Create server socket and connect to clients
     server_socket = socket.create_server(("localhost", 4221))
+    server_socket.settimeout(0.1) # Set timeout 
 
     try:
         while True:
-            # Wait for a connection
-            client, addr = server_socket.accept() # wait for client
+            try:
+                # Wait for a connection
+                client, addr = server_socket.accept() # wait for client
 
-            # Create a new thread for each request
-            thread = threading.Thread(target=handle_request, args=(client, addr))
-            thread.start()
+                # Create a new thread for each request
+                thread = threading.Thread(target=handle_request, args=(client, addr))
+                thread.start()
+            # Timeout allows checks for KeyboardInterrupt
+            except TimeoutError:    
+                pass
     except KeyboardInterrupt:
         print("\nServer is shutting down.")
     finally:
