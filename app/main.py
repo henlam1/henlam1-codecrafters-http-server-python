@@ -8,16 +8,17 @@ CRLF = "\r\n"
 
 # Generate responses
 def generate_response(status, content_type, body):
-    response = []
-    if status:
-        response.append(f"HTTP/1.1 {status}")   # Version and status
-    if content_type:
-        response.append(f"Content-Type: {content_type}")    # Headers
-        response.append(f"Content-Length: {len(body)}")
-    response.append(f"")    # End of headers
-    if body:
-        response.append(body)
-    return CRLF.join(response)
+    if content_type or body:
+        response = [
+            f"HTTP/1.1 {status}",  # Version and status
+            f"Content-Type: {content_type}",  # Headers
+            f"Content-Length: {len(body)}",
+            f"",  # End of headers
+            body,
+        ]
+        return CRLF.join(response)
+    else:
+        return f"HTTP/1.1 {status}{CRLF}"
 
 # Handle routes
 def handle_root():
@@ -43,13 +44,13 @@ def read_file(path):
     
     # Return file content
     content = None
-    with open (path, "r") as file:
+    with open(path, "r") as file:
         content = file.read()
     return generate_response("200 OK", "application/octet-stream", content)
 
 def write_file(path, content):
     # Write to file
-    with open (path, "w") as file:
+    with open(path, "w") as file:
         file.write(content)
     return generate_response("201 OK", "", "")
 
