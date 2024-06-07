@@ -29,10 +29,13 @@ def handle_user_agent(request, path, version, headers):
     # Return 404 if not found
     if 'User-Agent' not in headers:
         return handle_404()
+    
+    # Return user agent
     agent = headers['User-Agent']
     return generate_response("200 OK", "text/plain", agent)
 
 def handle_files(request, path, version, headers):
+    # Create file path
     file_name = path.split("/files/")[1]
     path_to_file = f"{base_directory}/{file_name}"
 
@@ -40,6 +43,7 @@ def handle_files(request, path, version, headers):
     if not os.path.isfile(path_to_file):
         return handle_404()
 
+    # Return file content
     content = None
     with open (path_to_file, "r") as file:
         content = file.read()
