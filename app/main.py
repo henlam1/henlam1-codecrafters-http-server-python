@@ -34,6 +34,19 @@ def handle_user_agent(request, path, version, headers):
     agent = headers['User-Agent']
     return generate_response("200 OK", "text/plain", agent)
 
+def read_file(path):
+    # Return file content
+    content = None
+    with open (path, "r") as file:
+        content = file.read()
+    return generate_response("200 OK", "application/octet-stream", content)
+
+def write_file(path, content):
+    # Write to file
+    with open (path, "w") as file:
+        file.write(content)
+    return generate_response("200 OK", None, None)
+
 def handle_files(request, path, version, headers):
     # Create file path
     file_name = path.split("/files/")[1]
@@ -43,11 +56,14 @@ def handle_files(request, path, version, headers):
     if not os.path.isfile(path_to_file):
         return handle_404()
 
-    # Return file content
-    content = None
-    with open (path_to_file, "r") as file:
-        content = file.read()
-    return generate_response("200 OK", "application/octet-stream", content)
+    # Handle different requests
+    if request == "GET":
+        return read_file(path_to_file)
+    if request == "POST":
+        return write_file(path_to_file)
+    
+    return handle_404()
+    
 
 def handle_404():
     return "HTTP/1.1 404 Not Found\r\n\r\n"
