@@ -1,5 +1,7 @@
 import socket
 import threading
+import argparse
+import os
 
 # Constants
 CRLF = "\r\n"
@@ -24,10 +26,24 @@ def handle_echo(request, path, version, headers):
     return generate_response("200 OK", "text/plain", content)
 
 def handle_user_agent(request, path, version, headers):
+    # Return 404 if not found
     if 'User-Agent' not in headers:
         return handle_404()
     agent = headers['User-Agent']
     return generate_response("200 OK", "text/plain", agent)
+
+def handle_files(request, path, version, headers):
+    file_name = path.split("/files/")[1]
+    path_to_file = f"{base_directory}/{file_name}"
+
+    # Return 404 if not found
+    if not os.path.isfile(path_to_file):
+        return handle_404()
+
+    content = None
+    with open (path_to_file, "r") as file:
+        content = file.read()
+    return generate_response("200 OK", "application/octet-stream", content)
 
 def handle_404():
     return "HTTP/1.1 404 Not Found\r\n\r\n"
@@ -53,6 +69,7 @@ def handle_endpoints(request, path, version, headers):
 ROUTES = {
     'echo': handle_echo,
     'user-agent': handle_user_agent,
+    'files': handle_files
 }
 
 def parse_request(data):
@@ -89,6 +106,17 @@ def handle_request(client_socket: socket, addr):
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
+
+    # Parse CLI arguments
+    parser = argparse.ArgumentParser(
+                    prog='main.py',
+                    description='Simple HTTP server')
+    parser.add_argument("--directory", type=str, help="Directory to change to.")
+    args = parser.parse_args()
+
+    # Set directory globally
+    global base_directory
+    base_directory = args.directory
 
     # Create server socket and connect to clients
     server_socket = socket.create_server(("localhost", 4221))
