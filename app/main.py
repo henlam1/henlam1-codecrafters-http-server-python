@@ -5,7 +5,7 @@ import os
 
 # Constants
 CRLF = "\r\n"
-ENCODINGS = set("gzip")
+ENCODINGS = set(["gzip"])
 
 # Generate responses
 def generate_response(status, content_type, body, encoding=None):
