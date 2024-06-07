@@ -8,17 +8,20 @@ CRLF = "\r\n"
 
 # Generate responses
 def generate_response(status, content_type, body):
+    response = [
+        f"HTTP/1.1 {status}",  # Version and status
+    ]
     if content_type or body:
-        response = [
-            f"HTTP/1.1 {status}",  # Version and status
+        add_ons = [
             f"Content-Type: {content_type}",  # Headers
             f"Content-Length: {len(body)}",
             f"",  # End of headers
             body,
         ]
-        return CRLF.join(response)
+        response.extend(add_ons)
     else:
-        return f"HTTP/1.1 {status}{CRLF}"
+        response.append(CRLF)
+    return CRLF.join(response)
 
 # Handle routes
 def handle_root():
