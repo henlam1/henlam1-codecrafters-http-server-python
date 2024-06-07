@@ -8,13 +8,15 @@ CRLF = "\r\n"
 
 # Generate responses
 def generate_response(status, content_type, body):
-    response = [
-        f"HTTP/1.1 {status}",   # Version and status
-        f"Content-Type: {content_type}",    # Headers
-        f"Content-Length: {len(body)}",
-        f"",    # End of headers
-        body
-    ]
+    response = []
+    if status:
+        response.append(f"HTTP/1.1 {status}")   # Version and status
+    if content_type:
+        response.append(f"Content-Type: {content_type}")    # Headers
+    if body:
+        response.append(f"Content-Length: {len(body)}")
+        response.append(f"")    # End of headers
+        response.append(body)
     return CRLF.join(response)
 
 # Handle routes
@@ -49,7 +51,7 @@ def write_file(path, content):
     # Write to file
     with open (path, "w") as file:
         file.write(content)
-    return generate_response("201 OK", None, None)
+    return generate_response("201 OK", "", "")
 
 def handle_files(request, path, version, headers, body):
     # Create file path
