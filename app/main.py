@@ -21,11 +21,11 @@ def generate_response(status, content_type, body):
 def handle_root():
     return "HTTP/1.1 200 OK\r\n\r\n"
 
-def handle_echo(request, path, version, headers):
+def handle_echo(request, path, version, headers, body):
     content = path.split("/echo/")[1]
     return generate_response("200 OK", "text/plain", content)
 
-def handle_user_agent(request, path, version, headers):
+def handle_user_agent(request, path, version, headers, body):
     # Return 404 if not found
     if 'User-Agent' not in headers:
         return handle_404()
@@ -35,6 +35,10 @@ def handle_user_agent(request, path, version, headers):
     return generate_response("200 OK", "text/plain", agent)
 
 def read_file(path):
+    # Return 404 if not found
+    if not os.path.isfile(path):
+        return handle_404()
+    
     # Return file content
     content = None
     with open (path, "r") as file:
@@ -45,22 +49,18 @@ def write_file(path, content):
     # Write to file
     with open (path, "w") as file:
         file.write(content)
-    return generate_response("200 OK", None, None)
+    return generate_response("201 OK", None, None)
 
-def handle_files(request, path, version, headers):
+def handle_files(request, path, version, headers, body):
     # Create file path
     file_name = path.split("/files/")[1]
     path_to_file = f"{base_directory}/{file_name}"
-
-    # Return 404 if not found
-    if not os.path.isfile(path_to_file):
-        return handle_404()
 
     # Handle different requests
     if request == "GET":
         return read_file(path_to_file)
     if request == "POST":
-        return write_file(path_to_file)
+        return write_file(path_to_file, body)
     
     return handle_404()
     
@@ -68,7 +68,7 @@ def handle_files(request, path, version, headers):
 def handle_404():
     return "HTTP/1.1 404 Not Found\r\n\r\n"
 
-def handle_endpoints(request, path, version, headers):
+def handle_endpoints(request, path, version, headers, body):
     # Handles root first
     if path == '/':
         return handle_root()
@@ -80,7 +80,7 @@ def handle_endpoints(request, path, version, headers):
     endpoint = params[1]
     if endpoint in ROUTES:
         handler = ROUTES[endpoint]
-        return handler(request, path, version, headers)
+        return handler(request, path, version, headers, body)
         
     # Return error if endpoint not found
     return handle_404()
@@ -105,8 +105,9 @@ def parse_request(data):
         # Build headers by separating colons
         header, value = line.split(": ", 1)
         headers[header] = value
+    body = lines[-1]
     
-    return request, path, version, headers
+    return request, path, version, headers, body, body
 
 def handle_request(client_socket: socket, addr):
     print(f"Connection to {addr} has been established")
@@ -115,10 +116,10 @@ def handle_request(client_socket: socket, addr):
     data = client_socket.recv(1024)
 
     # Parse request into usable components
-    request, path, version, headers = parse_request(data)
+    request, path, version, headers, body = parse_request(data)
 
     # Handle request
-    response = handle_endpoints(request, path, version, headers)
+    response = handle_endpoints(request, path, version, headers, body)
 
     # Send the encoded response to the client
     client_socket.send(response.encode())
