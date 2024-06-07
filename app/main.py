@@ -55,7 +55,7 @@ def write_file(path, content):
     # Write to file
     with open(path, "w") as file:
         file.write(content)
-    return generate_response("201 OK", "", "")
+    return generate_response("201 CREATED", "", "")
 
 def handle_files(request, path, version, headers, body):
     # Create file path
