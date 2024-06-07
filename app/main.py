@@ -5,12 +5,17 @@ import os
 
 # Constants
 CRLF = "\r\n"
+ENCODINGS = set("gzip")
 
 # Generate responses
-def generate_response(status, content_type, body):
+def generate_response(status, content_type, body, encoding=None):
     response = [
         f"HTTP/1.1 {status}",  # Version and status
     ]
+    # Encoding header
+    if encoding:
+        response.extend(f"Content-Encoding: {encoding}")
+    # GET requests
     if content_type or body:
         add_ons = [
             f"Content-Type: {content_type}",  # Headers
@@ -19,6 +24,7 @@ def generate_response(status, content_type, body):
             body,
         ]
         response.extend(add_ons)
+    # POST requests
     else:
         response.append(CRLF)
     return CRLF.join(response)
@@ -29,15 +35,22 @@ def handle_root():
 
 def handle_echo(request, path, version, headers, body):
     content = path.split("/echo/")[1]
-    return generate_response("200 OK", "text/plain", content)
+    encoding = headers.get("accept-encoding")
+
+    # Encoding not found/invalid
+    if encoding not in ENCODINGS:
+        return generate_response("200 OK", "text/plain", content)
+    
+    # Encoding found
+    return generate_response("200 OK", "text/plain", content, encoding)
 
 def handle_user_agent(request, path, version, headers, body):
     # Return 404 if not found
-    if 'User-Agent' not in headers:
+    agent = headers.get('user-agent')
+    if agent is None:
         return handle_404()
     
     # Return user agent
-    agent = headers['User-Agent']
     return generate_response("200 OK", "text/plain", agent)
 
 def read_file(path):
@@ -110,7 +123,7 @@ def parse_request(data):
 
         # Build headers by separating colons
         header, value = line.split(": ", 1)
-        headers[header] = value
+        headers[header.lower()] = value # lower-case all headers for consistency
     body = lines[-1]
     
     return request, path, version, headers, body
