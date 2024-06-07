@@ -14,7 +14,7 @@ def generate_response(status, content_type, body, encoding=None):
     ]
     # Encoding header
     if encoding:
-        response.extend(f"Content-Encoding: {encoding}")
+        response.append(f"Content-Encoding: {encoding}")
     # GET requests
     if content_type or body:
         add_ons = [
