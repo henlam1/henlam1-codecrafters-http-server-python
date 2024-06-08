@@ -22,6 +22,8 @@ def generate_response(status, content_type, body, encoding=None):
     if body:
         if isinstance(body, str):
             body = body.encode()
+    else:
+        headers.append(CRLF)
     # GET requests
     if content_type:
         headers.extend([
