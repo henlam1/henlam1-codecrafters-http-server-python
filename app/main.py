@@ -21,13 +21,13 @@ def generate_response(status, content_type, body, encoding=None):
             f"Content-Type: {content_type}",  # Headers
             f"Content-Length: {len(body)}",
             f"",  # End of headers
-            body,
+            str(body),
         ]
         response.extend(add_ons)
     # POST requests
     else:
         response.append(CRLF)
-    return CRLF.join(response)
+    return CRLF.join(response).encode()
 
 # Handle encodings
 def gzip_compress(content):
@@ -160,7 +160,7 @@ def handle_request(client_socket: socket, addr):
     response = handle_endpoints(request, path, version, headers, body)
 
     # Send the encoded response to the client
-    client_socket.send(response.encode())
+    client_socket.send(response)
 
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
