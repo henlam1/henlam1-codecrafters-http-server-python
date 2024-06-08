@@ -23,7 +23,7 @@ def generate_response(status, content_type, body, encoding=None):
             f"",  # End of headers
         ])
     if body:
-        # Encode body to bytes for consistency
+        # Encode body to bytes for consistency (body can be bytes or str)
         if isinstance(body, str):
             body = CRLF + body
             body = body.encode()
@@ -31,7 +31,7 @@ def generate_response(status, content_type, body, encoding=None):
             body = CRLF.encode() + body
     
     # Convert headers to bytes
-    response = CRLF.join(headers).encode()
+    response = CRLF.join(headers).encode() + body
     return response
 
 
