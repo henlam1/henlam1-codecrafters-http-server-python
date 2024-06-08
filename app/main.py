@@ -85,7 +85,8 @@ ENCODINGS = {
 
 # Handle routes
 def handle_root():
-    return "HTTP/1.1 200 OK\r\n\r\n"
+    # return "HTTP/1.1 200 OK\r\n\r\n".encode()
+    return generate_response("200 OK", "", "")
 
 def handle_echo(request, path, version, headers, body):
     content = path.split("/echo/")[1]
@@ -117,7 +118,8 @@ def handle_user_agent(request, path, version, headers, body):
     return generate_response("200 OK", "text/plain", agent)
 
 def handle_404():
-    return "HTTP/1.1 404 Not Found\r\n\r\n".encode()
+    # return "HTTP/1.1 404 Not Found\r\n\r\n".encode()
+    return generate_response("404 Not Found", "", "")
 
 def handle_endpoints(request, path, version, headers, body):
     # Handles root first
