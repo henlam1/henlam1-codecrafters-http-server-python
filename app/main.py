@@ -9,25 +9,31 @@ CRLF = "\r\n"
 
 # Generate responses
 def generate_response(status, content_type, body, encoding=None):
-    response = [
+    headers = [
         f"HTTP/1.1 {status}",  # Version and status
     ]
     # Encoding header
     if encoding:
-        response.append(f"Content-Encoding: {encoding}")
+        headers.append(f"Content-Encoding: {encoding}")
     # GET requests
-    if content_type or body:
-        add_ons = [
+    if content_type:
+        headers.extend([
             f"Content-Type: {content_type}",  # Headers
             f"Content-Length: {len(body)}",
             f"",  # End of headers
-            str(body),
-        ]
-        response.extend(add_ons)
-    # POST requests
-    else:
-        response.append(CRLF)
-    return CRLF.join(response).encode()
+        ])
+    if body:
+        # Encode body to bytes for consistency
+        if isinstance(body, str):
+            body = CRLF + body
+            body = body.encode()
+        if isinstance(body, bytes):
+            body = CRLF.encode() + body
+    
+    # Convert headers to bytes
+    response = CRLF.join(headers).encode()
+    return response
+
 
 # Handle encodings
 def gzip_compress(content):
