@@ -42,6 +42,7 @@ def handle_echo(request, path, version, headers, body):
         return generate_response("200 OK", "text/plain", content)
 
     # Check each encoding
+    encodings = encodings.split(", ")
     for encoding in encodings:
         # Encoding found
         if encoding in ENCODINGS:  
