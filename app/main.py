@@ -35,15 +35,17 @@ def handle_root():
 
 def handle_echo(request, path, version, headers, body):
     content = path.split("/echo/")[1]
-    encoding = headers.get("accept-encoding")
+    encodings = headers.get("accept-encoding").split(', ')  # split encodings into a list
 
-    # Encoding not found/invalid
-    if encoding not in ENCODINGS:
-        return generate_response("200 OK", "text/plain", content)
+    # Check each encoding
+    for encoding in encodings:
+        # Encoding found
+        if encoding in ENCODINGS:  
+            return generate_response("200 OK", "text/plain", content, encoding)
+
+    # Encodings not found
+    return generate_response("200 OK", "text/plain", content)
     
-    # Encoding found
-    return generate_response("200 OK", "text/plain", content, encoding)
-
 def handle_user_agent(request, path, version, headers, body):
     # Return 404 if not found
     agent = headers.get('user-agent')
