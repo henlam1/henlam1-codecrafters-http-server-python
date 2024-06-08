@@ -7,38 +7,6 @@ import gzip
 # Constants
 CRLF = "\r\n"
 
-# # Generate responses
-# def generate_response(status, content_type, body, encoding=None):
-#     headers = [
-#         f"HTTP/1.1 {status}",  # Version and status
-#     ]
-#     # Encoding header
-#     if encoding:
-#         headers.append(f"Content-Encoding: {encoding}")
-#         # Compress body to assigned encoding
-#         compressor = ENCODINGS[encoding]
-#         body = compressor(body.encode)
-#     # Convert body to bytes for consistency
-#     if body:
-#         if isinstance(body, str):
-#             body = body.encode()
-#     # GET requests
-#     if content_type:
-#         headers.extend([
-#             f"Content-Type: {content_type}",  # Headers
-#             f"Content-Length: {len(body)}",
-#             f"",  # End of headers
-#         ])
-    
-#     # Convert headers to bytes
-#     header_bytes = CRLF.join(headers).encode()
-
-#     # Return body with headers
-#     if body:
-#         return header_bytes + CRLF.encode() + body
-    
-#     return header_bytes
-
 # Generate responses
 def generate_response(status, content_type, body, encoding=None):
     response = [
@@ -85,7 +53,6 @@ ENCODINGS = {
 
 # Handle routes
 def handle_root():
-    # return "HTTP/1.1 200 OK\r\n\r\n".encode()
     return generate_response("200 OK", "", "")
 
 def handle_echo(request, path, version, headers, body):
@@ -118,7 +85,6 @@ def handle_user_agent(request, path, version, headers, body):
     return generate_response("200 OK", "text/plain", agent)
 
 def handle_404():
-    # return "HTTP/1.1 404 Not Found\r\n\r\n".encode()
     return generate_response("404 Not Found", "", "")
 
 def handle_endpoints(request, path, version, headers, body):
