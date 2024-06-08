@@ -2,10 +2,10 @@ import socket
 import threading
 import argparse
 import os
+import gzip
 
 # Constants
 CRLF = "\r\n"
-ENCODINGS = set(["gzip"])
 
 # Generate responses
 def generate_response(status, content_type, body, encoding=None):
@@ -29,6 +29,15 @@ def generate_response(status, content_type, body, encoding=None):
         response.append(CRLF)
     return CRLF.join(response)
 
+# Handle encodings
+def gzip_compress(content):
+    return gzip.compress(content)
+
+# Encoding table
+ENCODINGS = {
+    'gzip': gzip_compress
+}
+
 # Handle routes
 def handle_root():
     return "HTTP/1.1 200 OK\r\n\r\n"
@@ -45,7 +54,7 @@ def handle_echo(request, path, version, headers, body):
     encodings = encodings.split(", ")   # split encodings into a list
     for encoding in encodings:
         # Encoding found
-        if encoding in ENCODINGS:  
+        if ENCODINGS.get(encoding):  
             return generate_response("200 OK", "text/plain", content, encoding)
 
     # Encodings are invalid
@@ -60,6 +69,27 @@ def handle_user_agent(request, path, version, headers, body):
     # Return user agent
     return generate_response("200 OK", "text/plain", agent)
 
+def handle_404():
+    return "HTTP/1.1 404 Not Found\r\n\r\n"
+
+def handle_endpoints(request, path, version, headers, body):
+    # Handles root first
+    if path == '/':
+        return handle_root()
+    
+    # Split params by '/' delimeter
+    params = path.split('/')
+
+    # Handle all other endpoints
+    endpoint = params[1]
+    if endpoint in ROUTES:
+        handler = ROUTES[endpoint]
+        return handler(request, path, version, headers, body)
+        
+    # Return error if endpoint not found
+    return handle_404()
+
+# File read/writes
 def read_file(path):
     # Return 404 if not found
     if not os.path.isfile(path):
@@ -89,27 +119,6 @@ def handle_files(request, path, version, headers, body):
         return write_file(path_to_file, body)
     
     return handle_404()
-    
-
-def handle_404():
-    return "HTTP/1.1 404 Not Found\r\n\r\n"
-
-def handle_endpoints(request, path, version, headers, body):
-    # Handles root first
-    if path == '/':
-        return handle_root()
-    
-    # Split params by '/' delimeter
-    params = path.split('/')
-
-    # Handle all other endpoints
-    endpoint = params[1]
-    if endpoint in ROUTES:
-        handler = ROUTES[endpoint]
-        return handler(request, path, version, headers, body)
-        
-    # Return error if endpoint not found
-    return handle_404()
 
 # Routing Table
 ROUTES = {
@@ -118,6 +127,7 @@ ROUTES = {
     'files': handle_files
 }
 
+# Handle requests
 def parse_request(data):
     # Decode and split data (requst, path, version, and headers)
     lines = data.decode().split(CRLF)
