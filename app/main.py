@@ -15,6 +15,9 @@ def generate_response(status, content_type, body, encoding=None):
     # Encoding header
     if encoding:
         headers.append(f"Content-Encoding: {encoding}")
+        # Compress body to assigned encoding
+        compressor = ENCODINGS[encoding]
+        body = compressor(body.encode())
     # Convert body to bytes for consistency
     if body:
         if isinstance(body, str):
@@ -63,9 +66,7 @@ def handle_echo(request, path, version, headers, body):
     for encoding in encodings:
         # Encoding found
         if encoding in ENCODINGS:  
-            compressor = ENCODINGS[encoding]
-            compressed = compressor(body.encode())  # only compress bytes
-            return generate_response("200 OK", "text/plain", compressed, encoding)
+            return generate_response("200 OK", "text/plain", content, encoding)
 
     # Encodings are invalid
     return generate_response("200 OK", "text/plain", content)
