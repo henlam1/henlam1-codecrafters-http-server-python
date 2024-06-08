@@ -15,6 +15,10 @@ def generate_response(status, content_type, body, encoding=None):
     # Encoding header
     if encoding:
         headers.append(f"Content-Encoding: {encoding}")
+    # Convert body to bytes for consistency
+    if body:
+        if isinstance(body, str):
+            body = body.encode()
     # GET requests
     if content_type:
         headers.extend([
@@ -26,10 +30,8 @@ def generate_response(status, content_type, body, encoding=None):
     # Convert headers to bytes
     header_bytes = CRLF.join(headers).encode()
 
-    # Convert body to bytes for consistency
+    # Return body with headers
     if body:
-        if isinstance(body, str):
-            body = body.encode()
         return header_bytes + CRLF.encode() + body
     
     return header_bytes
