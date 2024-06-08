@@ -54,8 +54,9 @@ def handle_echo(request, path, version, headers, body):
     encodings = encodings.split(", ")   # split encodings into a list
     for encoding in encodings:
         # Encoding found
-        if ENCODINGS.get(encoding):  
-            return generate_response("200 OK", "text/plain", content, encoding)
+        if encoding in ENCODINGS:  
+            compressed = ENCODINGS[content]
+            return generate_response("200 OK", "text/plain", compressed, encoding)
 
     # Encodings are invalid
     return generate_response("200 OK", "text/plain", content)
