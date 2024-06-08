@@ -55,7 +55,8 @@ def handle_echo(request, path, version, headers, body):
     for encoding in encodings:
         # Encoding found
         if encoding in ENCODINGS:  
-            compressed = ENCODINGS[content]
+            compressor = ENCODINGS[content]
+            compressed = compressor(content)
             return generate_response("200 OK", "text/plain", compressed, encoding)
 
     # Encodings are invalid
