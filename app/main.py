@@ -35,14 +35,14 @@ def handle_root():
 
 def handle_echo(request, path, version, headers, body):
     content = path.split("/echo/")[1]
-    encodings = headers.get("accept-encoding")  # split encodings into a list
+    encodings = headers.get("accept-encoding")  # Either encodings or None
 
     # No encodings
     if encodings is None:
         return generate_response("200 OK", "text/plain", content)
 
     # Check each encoding
-    encodings = encodings.split(", ")
+    encodings = encodings.split(", ")   # split encodings into a list
     for encoding in encodings:
         # Encoding found
         if encoding in ENCODINGS:  
