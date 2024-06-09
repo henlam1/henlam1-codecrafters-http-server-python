@@ -1,2 +1,0 @@
-# Constants
-CRLF = "\r\n"
