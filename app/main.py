@@ -69,7 +69,7 @@ def generate_response(status, content_type, body, encoding=None):
     # Prepare body and headers
     body = prepare_body(body)
     headers = prepare_headers(status, content_type, body, encoding)
-    response = CRLF.join(response).encode() + CRLF.encode() + body
+    response = CRLF.join(headers).encode() + CRLF.encode() + body
 
     return response
 
