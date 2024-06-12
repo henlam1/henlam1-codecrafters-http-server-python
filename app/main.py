@@ -15,13 +15,16 @@ def prepare_headers(status, content_type, body, encoding):
     # Add encoding headers
     if encoding:
         headers.append(f"Content-Encoding: {encoding}")
-    # Add content headers
-    if content_type:
+    # GET requests
+    if content_type and body:
         headers.extend([
             f"Content-Type: {content_type}",  # Headers
             f"Content-Length: {len(body)}",
             f"",  # End of headers
         ])
+    # POST requests
+    else:
+        headers.append(CRLF)
     
     return headers
 
