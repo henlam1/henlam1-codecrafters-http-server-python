@@ -8,39 +8,70 @@ import gzip
 CRLF = "\r\n"
 
 # Generate responses
-def generate_response(status, content_type, body, encoding=None):
-    response = [
-        f"HTTP/1.1 {status}",  # Version and status
+def prepare_headers(status, content_type, body, encoding=None):
+    headers = [
+        f"HTTP/1.1 {status}"
     ]
-    # Encoding header
-    if encoding:
-        response.append(f"Content-Encoding: {encoding}")
-
-    # GET requests
-    if content_type and body:
-        # Add extra headers
-        add_ons = [
+    # Add content headers
+    if content_type:
+        headers.extend([
             f"Content-Type: {content_type}",  # Headers
             f"Content-Length: {len(body)}",
             f"",  # End of headers
-        ]
-        response.extend(add_ons)
-
-        # Convert body into bytes for consistency (sometimes bytes or string)
-        if isinstance(body, str):
-            body = body.encode()
-    # POST requests
-    else:
-        response.append(CRLF)
-
-    # Convert response into bytes
-    response = CRLF.join(response).encode()
-
-    if body:
-        response = response + CRLF.encode() + body
+        ])
+    # Add encoding headers
+    if encoding:
+        headers.append(f"Content-Encoding: {encoding}")
     
-    return response
+    return headers
 
+def prepare_body(body):
+    # Transform string bodies into bytes
+    if isinstance(body, str):
+        body = body.encode()
+    
+    return body
+
+# def generate_response(status, content_type, body, encoding=None):
+#     response = [
+#         f"HTTP/1.1 {status}",  # Version and status
+#     ]
+#     # Encoding header
+#     if encoding:
+#         response.append(f"Content-Encoding: {encoding}")
+
+#     # GET requests
+#     if content_type and body:
+#         # Add extra headers
+#         add_ons = [
+#             f"Content-Type: {content_type}",  # Headers
+#             f"Content-Length: {len(body)}",
+#             f"",  # End of headers
+#         ]
+#         response.extend(add_ons)
+
+#         # Convert body into bytes for consistency (sometimes bytes or string)
+#         if isinstance(body, str):
+#             body = body.encode()
+#     # POST requests
+#     else:
+#         response.append(CRLF)
+
+#     # Convert response into bytes
+#     response = CRLF.join(response).encode()
+
+#     if body:
+#         response = response + CRLF.encode() + body
+    
+#     return response
+
+def generate_response(status, content_type, body, encoding=None):
+    # Prepare body and headers
+    body = prepare_body(body)
+    headers = prepare_headers(status, content_type, body, encoding)
+    response = CRLF.join(response).encode() + CRLF.encode() + body
+
+    return response
 
 # Handle encodings
 def gzip_compress(content):
