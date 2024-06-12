@@ -35,39 +35,6 @@ def prepare_body(body):
     
     return body
 
-# def generate_response(status, content_type, body, encoding=None):
-#     response = [
-#         f"HTTP/1.1 {status}",  # Version and status
-#     ]
-#     # Encoding header
-#     if encoding:
-#         response.append(f"Content-Encoding: {encoding}")
-
-#     # GET requests
-#     if content_type and body:
-#         # Add extra headers
-#         add_ons = [
-#             f"Content-Type: {content_type}",  # Headers
-#             f"Content-Length: {len(body)}",
-#             f"",  # End of headers
-#         ]
-#         response.extend(add_ons)
-
-#         # Convert body into bytes for consistency (sometimes bytes or string)
-#         if isinstance(body, str):
-#             body = body.encode()
-#     # POST requests
-#     else:
-#         response.append(CRLF)
-
-#     # Convert response into bytes
-#     response = CRLF.join(response).encode()
-
-#     if body:
-#         response = response + CRLF.encode() + body
-    
-#     return response
-
 def generate_response(status, content_type, body, encoding=None):
     # Prepare body and headers
     body = prepare_body(body)
