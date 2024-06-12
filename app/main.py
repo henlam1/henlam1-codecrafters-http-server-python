@@ -8,10 +8,13 @@ import gzip
 CRLF = "\r\n"
 
 # Generate responses
-def prepare_headers(status, content_type, body, encoding=None):
+def prepare_headers(status, content_type, body, encoding):
     headers = [
         f"HTTP/1.1 {status}"
     ]
+    # Add encoding headers
+    if encoding:
+        headers.append(f"Content-Encoding: {encoding}")
     # Add content headers
     if content_type:
         headers.extend([
@@ -19,9 +22,6 @@ def prepare_headers(status, content_type, body, encoding=None):
             f"Content-Length: {len(body)}",
             f"",  # End of headers
         ])
-    # Add encoding headers
-    if encoding:
-        headers.append(f"Content-Encoding: {encoding}")
     
     return headers
 
